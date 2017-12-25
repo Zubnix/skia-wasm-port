@@ -14,5 +14,5 @@ llvm bitcode from Skia sources. This library will become usable as soon as some 
 glue code is generated and included.
 
 # Building
-Cloning this library requires [git lfs](https://git-lfs.github.com/)
+This library requires [git lfs](https://git-lfs.github.com/)
 
