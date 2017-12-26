@@ -1,0 +1,32 @@
+callback releaseProc = void (VoidPtr pixels, VoidPtr context)
+
+enum SkSurface_ContentChangeMode {
+    "SkSurface::kDiscard_ContentChangeMode",
+    "SkSurface::kRetain_ContentChangeMode"
+};
+
+interface SkSurface {
+    [Value] static SkSurface MakeRasterDirect([Const, Ref] SkImageInfo imageInfo, VoidPtr pixels,
+                                             unsigned long rowBytes,
+                                             [Const] SkSurfaceProps surfaceProps);
+
+    [Value] static SkSurface MakeRasterDirectReleaseProc([Const, Ref] SkImageInfo imageInfo, VoidPtr pixels,
+                                    unsigned long rowBytes,
+                                    releaseProc,
+                                    VoidPtr context, [Const] SkSurfaceProps surfaceProps);
+
+    [Value] static SkSurface MakeRaster([Const, Ref] SkImageInfo imageInfo, unsigned long rowBytes,
+                                        [Const] SkSurfaceProps surfaceProps);
+
+    [Value] static SkSurface MakeRasterN32Premul(long width, long height, SkSurfaceProps props);
+
+    void SkSurface();
+
+    [Const] long width();
+
+    [Const] long height();
+
+    unsigned long generationID();
+
+    void notifyContentWillChange(ContentChangeMode mode);
+}
