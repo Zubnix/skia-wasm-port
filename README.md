@@ -13,7 +13,7 @@ static archive that contains all llvm bitcode needed to generate the final wasm,
 llvm bitcode from Skia sources. This library will become usable as soon as enough bindings are defined.
 
 An example is currently available under `sksurface_test.js` that can be run with node. Running in the
-browser is also possible if the png file saving is adjusted accordingly. The example exactly matches the one found in
+browser is also possible if the png file saving is adjusted accordingly. The example exactly matches the one found
 on the Skia [website](https://skia.org/user/api/creating_skcanvas).
 
 ![alt text](https://raw.githubusercontent.com/Zubnix/skia-wasm-port/master/out_raster.png)
