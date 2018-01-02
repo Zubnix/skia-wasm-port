@@ -1,1 +1,2 @@
 libskia_bitcode.a filter=lfs diff=lfs merge=lfs -text
+*.bc filter=lfs diff=lfs merge=lfs -text
