@@ -12,7 +12,11 @@ Currently a limited set of skia functions are defined (wip), so the library is n
 static archive that contains all llvm bitcode needed to generate the final wasm, as well as a script to generate this
 llvm bitcode from Skia sources. This library will become usable as soon as enough bindings are defined.
 
-A (very)j limited example is currently available under `sksurface_test.js` that can be run with node and in the browser (not tested).
+An example is currently available under `sksurface_test.js` that can be run with node. Running in the
+browser is also possible if the png file saving is adjusted accordingly. The example exactly matches the one found in
+on the Skia [website](https://skia.org/user/api/creating_skcanvas).
+
+![alt text](https://raw.githubusercontent.com/Zubnix/skia-wasm-port/master/out_raster.png)
 
 # Defining bindings
 Bindings are defined using [Embind](https://kripken.github.io/emscripten-site/docs/porting/connecting_cpp_and_javascript/embind.html).
