@@ -17,11 +17,13 @@ browser is also possible if the png file saving is adjusted accordingly. The exa
 on the Skia [website](https://skia.org/user/api/creating_skcanvas).
 
 Result of `example_star.js`:
+
 ![alt text](https://raw.githubusercontent.com/Zubnix/skia-wasm-port/master/out_star.png)
 
 Another example `example_text.js` demonstrates font rendering.
 
 Result of `example_text.js`:
+
 ![alt text](https://raw.githubusercontent.com/Zubnix/skia-wasm-port/master/out_text.png)
 
 # Defining bindings

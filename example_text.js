@@ -19,8 +19,8 @@ function main (skiaModule) {
   // by putting our fonts at /usr/share/fonts, skia will automagically find them.
   skiaModule.FS.mount(skiaModule.FS.filesystems.NODEFS, {root: './fonts'}, '/usr/share/fonts')
 
-  const width = 512
-  const height = 512
+  const width = 256
+  const height = 256
   const path = 'out_text.png'
   const rasterSurface = skiaModule.SkSurface.MakeRasterN32Premul(width, height, null)
   const rasterCanvas = rasterSurface.getCanvas()
