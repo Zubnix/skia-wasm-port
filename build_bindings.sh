@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 
 #eg /home/john/emsdk-portable
-EMSDK="path/to/em/sdk"
-#eg 1.37.27 or incoming
-EM_VERSION="0.0.0"
+#EMSDK="path/to/em/sdk"
+EMSDK="/home/zubzub/emsdk-portable"
+#eg 1.37.27
+#EM_VERSION="0.0.0"
+EM_VERSION="incoming"
 
 #export EMCC_DEBUG=1
 
@@ -27,4 +29,4 @@ ${EMSDK}/emscripten/${EM_VERSION}/emcc -O3 -std=c++11 \
 skia_bindings.cpp -o skia_bindings.bc
 
 printf "Generating final wasm\n"
-${EMSDK}/emscripten/${EM_VERSION}/emcc -O3 -std=c++11 --bind skia_bindings.bc libskia_bitcode.a -s WASM=1 -s MODULARIZE=1 -o skia.js
+${EMSDK}/emscripten/${EM_VERSION}/emcc -O3 -std=c++11 --bind skia_bindings.bc libskia.a -s USE_FREETYPE=1 -s WASM=1 -s MODULARIZE=1 -o skia.js

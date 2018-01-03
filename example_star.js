@@ -25,7 +25,7 @@ function draw (canvas) {
 function main (skiaModule) {
   const width = 256
   const height = 256
-  const path = 'out_raster.png'
+  const path = 'out_star.png'
   const rasterSurface = skiaModule.SkSurface.MakeRasterN32Premul(width, height, null)
   const rasterCanvas = rasterSurface.getCanvas()
   draw(rasterCanvas)
