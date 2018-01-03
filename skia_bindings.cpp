@@ -73,6 +73,11 @@ EMSCRIPTEN_BINDINGS(skia_module) {
     // SkData.h ->
     class_<SkData>("SkData")
         .smart_ptr<sk_sp<SkData>>("sk_sp<SkData>>")
+        .class_function("MakeFromMalloc",
+            optional_override([](std::string data, size_t length)->sk_sp<SkData>{
+                    return SkData::MakeFromMalloc(&data[0], length);
+                }),
+            allow_raw_pointers())
         .function("size",&SkData::size)
     ;
     // SkData.h ^
@@ -111,6 +116,10 @@ EMSCRIPTEN_BINDINGS(skia_module) {
     class_<SkTypeface>("SkTypeface")
         .smart_ptr<sk_sp<SkTypeface>>("sk_sp<SkTypeface>")
         .class_function("MakeDefault",&SkTypeface::MakeDefault)
+        .class_function("MakeFromFile",
+            optional_override([](std::string path, int index)->sk_sp<SkTypeface>{
+                                        return SkTypeface::MakeFromFile(path.c_str(), index);
+                                    }))
         .function("countGlyphs",&SkTypeface::countGlyphs)
     ;
     // SkTypeFace ^
@@ -121,6 +130,11 @@ EMSCRIPTEN_BINDINGS(skia_module) {
         .class_function("RefDefault",&SkFontMgr::RefDefault)
         .function("countFamilies",&SkFontMgr::countFamilies)
         .function("getFamilyName",&SkFontMgr::getFamilyName, allow_raw_pointers())
+        .function("makeFromData",&SkFontMgr::makeFromData)
+        .function("makeFromFile",
+            optional_override([](SkFontMgr& this_, std::string path, int ttcIndex)->sk_sp<SkTypeface>{
+                                        return this_.SkFontMgr::makeFromFile(path.c_str(), ttcIndex);
+                                    }))
     ;
     // SkFontMgr.h ^
 
@@ -155,10 +169,10 @@ EMSCRIPTEN_BINDINGS(skia_module) {
         .function("clear",&SkCanvas::clear)
         .function("translate",&SkCanvas::translate)
         .function("drawPath",&SkCanvas::drawPath)
-        .function("drawStringCharArray",
+        .function("drawText",
             // we wrap the real function in a lambda to do the conversion of the js string (represented as an std:string) to a c string
-            optional_override([](SkCanvas& this_, const std::string s,SkScalar x,SkScalar y,const SkPaint& p){
-                return this_.SkCanvas::drawString(s.c_str(), x, y, p);
+            optional_override([](SkCanvas& this_, const std::string text, SkScalar x,SkScalar y,const SkPaint& p){
+                return this_.SkCanvas::drawText(text.c_str(), text.length(), x, y, p);
             }),
             allow_raw_pointers())
     ;

@@ -5,21 +5,20 @@ function draw (skiaModule, canvas) {
   canvas.clear(0xFFFFFFFF) // white
 
   const paint = new skiaModule.SkPaint()
-
-  const typeface = skiaModule.SkTypeface.MakeDefault()
-  paint.setTypeface(typeface)
   paint.setTextSize(64.0)
   paint.setAntiAlias(true)
-  paint.setColor(0xFFFFFFFF)
-  paint.setStyle(skiaModule.SkPaint.Style.kFill_Style)
+  paint.setColor(0xff4281A4)
 
-
-  const text = 'Skia!'
-
-  canvas.drawStringCharArray(text, 100, 100, paint)
+  canvas.drawText('Skia', 20, 64, paint)
 }
 
 function main (skiaModule) {
+  skiaModule.FS.mkdir('/usr')
+  skiaModule.FS.mkdir('/usr/share')
+  skiaModule.FS.mkdir('/usr/share/fonts')
+  // by putting our fonts at /usr/share/fonts, skia will automagically find them.
+  skiaModule.FS.mount(skiaModule.FS.filesystems.NODEFS, {root: './fonts'}, '/usr/share/fonts')
+
   const width = 512
   const height = 512
   const path = 'out_text.png'

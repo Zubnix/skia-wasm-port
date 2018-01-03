@@ -29,4 +29,4 @@ ${EMSDK}/emscripten/${EM_VERSION}/emcc -O3 -std=c++11 \
 skia_bindings.cpp -o skia_bindings.bc
 
 printf "Generating final wasm\n"
-${EMSDK}/emscripten/${EM_VERSION}/emcc -O3 -std=c++11 --bind skia_bindings.bc libskia.a -s USE_FREETYPE=1 -s WASM=1 -s MODULARIZE=1 -o skia.js
+${EMSDK}/emscripten/${EM_VERSION}/emcc -O3 -std=c++11 --bind skia_bindings.bc libskia.a -s USE_FREETYPE=1 -s WASM=1 -s MODULARIZE=1 -s FORCE_FILESYSTEM=1 -s 'EXTRA_EXPORTED_RUNTIME_METHODS=["FS"]' -o skia.js

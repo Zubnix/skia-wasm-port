@@ -2,4 +2,3 @@ skia.js
 skia.wasm
 skia_bindings.bc
 .idea/
-out_text.png
