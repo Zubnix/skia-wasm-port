@@ -27,6 +27,8 @@ namespace emscripten {
 #include <emscripten/bind.h>
 
 using namespace emscripten;
+using emscripten::val;
+using emscripten::vecFromJSArray;
 
 // to map from raw memory to a uint8array
 val getSkDataBytes(const SkData* data) {
@@ -34,6 +36,11 @@ val getSkDataBytes(const SkData* data) {
 }
 
 EMSCRIPTEN_BINDINGS(skia_module) {
+    // register array types, used by various functions to provide arrays as arguments functionality
+    register_vector<SkPoint>("VectorSkPoint");
+    register_vector<SkColor>("VectorSkColor");
+    register_vector<SkScalar>("VectorSkScalar");
+
     function("getSkDataBytes", &getSkDataBytes, allow_raw_pointers());
 
     // SkSurfaceProps.h ->
@@ -82,6 +89,14 @@ EMSCRIPTEN_BINDINGS(skia_module) {
     ;
     // SkData.h ^
 
+    // SkPoint.h ->
+    class_<SkPoint>("SkPoint")
+        .class_function("Make",&SkPoint::Make)
+        .property("fX",&SkPoint::fX)
+        .property("fY",&SkPoint::fY)
+    ;
+    // SkPoint.h ^
+
     // SkString.h ->
     class_<SkString>("SkString")
         .constructor<>()
@@ -104,10 +119,14 @@ EMSCRIPTEN_BINDINGS(skia_module) {
     class_<SkPath>("SkPath")
         .constructor<>()
         .constructor<const SkPath&>()
-        .function("moveToXY",select_overload<void(SkScalar,SkScalar)>(&SkPath::moveTo))
-        .function("moveToPoint",select_overload<void(const SkPoint& p)>(&SkPath::moveTo))
-        .function("lineToXY",select_overload<void(SkScalar,SkScalar)>(&SkPath::lineTo))
-        .function("lineToPoint",select_overload<void(const SkPoint& p)>(&SkPath::lineTo))
+        .function("moveToXY",
+            select_overload<void(SkScalar,SkScalar)>(&SkPath::moveTo))
+        .function("moveToPoint",
+            select_overload<void(const SkPoint& p)>(&SkPath::moveTo))
+        .function("lineToXY",
+            select_overload<void(SkScalar,SkScalar)>(&SkPath::lineTo))
+        .function("lineToPoint",
+            select_overload<void(const SkPoint& p)>(&SkPath::lineTo))
         .function("close",&SkPath::close)
     ;
     // SkPath.h ^
@@ -149,6 +168,7 @@ EMSCRIPTEN_BINDINGS(skia_module) {
         .function("setTextScaleX",&SkPaint::setTextScaleX)
         .function("getTypeface",&SkPaint::getTypeface, allow_raw_pointers())
         .function("setTypeface",&SkPaint::setTypeface)
+        .function("setShader",&SkPaint::setShader)
     ;
 
     enum_<SkPaint::Style>("SkPaint.Style")
@@ -175,6 +195,7 @@ EMSCRIPTEN_BINDINGS(skia_module) {
                 return this_.SkCanvas::drawText(text.c_str(), text.length(), x, y, p);
             }),
             allow_raw_pointers())
+        .function("drawPaint",&SkCanvas::drawPaint)
     ;
     // SkCanvas ^
 
@@ -183,11 +204,43 @@ EMSCRIPTEN_BINDINGS(skia_module) {
         .smart_ptr<sk_sp<SkSurface>>("sk_sp<SkSurface>")
         .class_function("MakeRasterDirect",&SkSurface::MakeRasterDirect, allow_raw_pointers())
         .class_function("MakeRasterN32Premul",&SkSurface::MakeRasterN32Premul, allow_raw_pointers())
-        .class_function("MakeRasterAutoRow", select_overload<sk_sp<SkSurface>(const SkImageInfo&,const SkSurfaceProps*)>(&SkSurface::MakeRaster), allow_raw_pointers())
+        .class_function("MakeRasterAutoRow",
+            select_overload<sk_sp<SkSurface>(const SkImageInfo&,const SkSurfaceProps*)>(&SkSurface::MakeRaster),
+            allow_raw_pointers())
         .function("width",&SkSurface::width)
         .function("height",&SkSurface::height)
         .function("getCanvas",&SkSurface::getCanvas, allow_raw_pointers())
         .function("makeImageSnapshot",&SkSurface::makeImageSnapshot)
     ;
     // SkSurface.h ^
+
+    // SkShader.h ->
+    class_<SkShader>("SkShader")
+        .smart_ptr<sk_sp<SkShader>>("sk_sp<SkShader>")
+    ;
+
+    enum_<SkShader::TileMode>("SkShader.TileMode")
+        .value("kClamp_TileMode",SkShader::TileMode::kClamp_TileMode)
+        .value("kRepeat_TileMode",SkShader::TileMode::kRepeat_TileMode)
+        .value("kMirror_TileMode",SkShader::TileMode::kMirror_TileMode)
+    ;
+    EM_ASM(
+        Module['SkShader']['TileMode'] = Module['SkShader.TileMode'];
+        delete Module['SkShader.TileMode'];
+    );
+    // SkShader.h ^
+
+    // SkGradientShader.h ->
+    class_<SkGradientShader>("SkGradientShader")
+        .class_function("MakeLinear",
+            optional_override([](const std::vector<SkPoint> pts, const std::vector<SkColor> colors, const std::vector<SkScalar> pos, int count, SkShader::TileMode mode)->sk_sp<SkShader>{
+                const SkPoint *ptsPtr = pts.data();
+                const SkColor *colorsPtr = colors.data();
+                const SkScalar *posPtr = pos.data();
+
+                return SkGradientShader::MakeLinear(ptsPtr, colorsPtr, posPtr, count, mode);
+            }),
+            allow_raw_pointers())
+    ;
+    // SkGradientShader.h ^
 }

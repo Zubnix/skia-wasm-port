@@ -16,13 +16,15 @@ An example is currently available under `example_star.js` that can be run with n
 browser is also possible if the png file saving is adjusted accordingly. The example exactly matches the one found
 on the Skia [website](https://skia.org/user/api/creating_skcanvas).
 
-Result of `example_star.js`:
+`example_star.js` demonstrates path rendering:
 
 ![alt text](https://raw.githubusercontent.com/Zubnix/skia-wasm-port/master/out_star.png)
 
-Another example `example_text.js` demonstrates font rendering.
+`example_gradient` demonstrates gradient shader:
 
-Result of `example_text.js`:
+![alt text](https://raw.githubusercontent.com/Zubnix/skia-wasm-port/master/out_gradient.png)
+
+`example_text.js` demonstrates font rendering:
 
 ![alt text](https://raw.githubusercontent.com/Zubnix/skia-wasm-port/master/out_text.png)
 
