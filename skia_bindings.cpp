@@ -131,6 +131,16 @@ EMSCRIPTEN_BINDINGS(skia_module) {
     ;
     // SkPath.h ^
 
+    // SkFontStyle.h ->
+    class_<SkFontStyle>("SkFontStyle")
+        .constructor<>()
+        .class_function("Normal",&SkFontStyle::Normal)
+        .class_function("Bold",&SkFontStyle::Bold)
+        .class_function("Italic",&SkFontStyle::Italic)
+        .class_function("BoldItalic",&SkFontStyle::BoldItalic)
+    ;
+    // SkFontStyle ^
+
     // SkTypeFace ->
     class_<SkTypeface>("SkTypeface")
         .smart_ptr<sk_sp<SkTypeface>>("sk_sp<SkTypeface>")
@@ -138,6 +148,10 @@ EMSCRIPTEN_BINDINGS(skia_module) {
         .class_function("MakeFromFile",
             optional_override([](std::string path, int index)->sk_sp<SkTypeface>{
                                         return SkTypeface::MakeFromFile(path.c_str(), index);
+                                    }))
+        .class_function("MakeFromName",
+            optional_override([](std::string familyName, SkFontStyle fontStyle)->sk_sp<SkTypeface>{
+                                        return SkTypeface::MakeFromName(familyName.c_str(), fontStyle);
                                     }))
         .function("countGlyphs",&SkTypeface::countGlyphs)
     ;
@@ -150,6 +164,7 @@ EMSCRIPTEN_BINDINGS(skia_module) {
         .function("countFamilies",&SkFontMgr::countFamilies)
         .function("getFamilyName",&SkFontMgr::getFamilyName, allow_raw_pointers())
         .function("makeFromData",&SkFontMgr::makeFromData)
+        .function("matchFaceStyle",&SkFontMgr::matchFaceStyle, allow_raw_pointers())
         .function("makeFromFile",
             optional_override([](SkFontMgr& this_, std::string path, int ttcIndex)->sk_sp<SkTypeface>{
                                         return this_.SkFontMgr::makeFromFile(path.c_str(), ttcIndex);
