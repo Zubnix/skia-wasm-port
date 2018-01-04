@@ -20,7 +20,7 @@ on the Skia [website](https://skia.org/user/api/creating_skcanvas).
 
 ![alt text](https://raw.githubusercontent.com/Zubnix/skia-wasm-port/master/out_star.png)
 
-`example_gradient` demonstrates gradient shader:
+`example_gradient.js` demonstrates gradient shader:
 
 ![alt text](https://raw.githubusercontent.com/Zubnix/skia-wasm-port/master/out_gradient.png)
 
