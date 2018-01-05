@@ -85,6 +85,7 @@ EMSCRIPTEN_BINDINGS(skia_module) {
                     return SkData::MakeFromMalloc(&data[0], length);
                 }),
             allow_raw_pointers())
+        .class_function("MakeUninitialized",&SkData::MakeUninitialized)
         .function("size",&SkData::size)
     ;
     // SkData.h ^

@@ -1,41 +1,38 @@
 const fs = require('fs')
+const path = require('path')
 const skia = require('./skia')
 
 function draw (skiaModule, canvas) {
   canvas.clear(0xFFFFFFFF) // white
 
+  // read data from file & copy it to wasm memory
+  const data = fs.readFileSync(path.join(__dirname, '.', 'fonts', 'liberation-fonts', 'LiberationMono-Regular.ttf'))
+  const nativeData = skiaModule.SkData.MakeUninitialized(data.byteLength)
+  const nativeBuffer = skiaModule.getSkDataBytes(nativeData)
+  nativeBuffer.set(data)
+  const liberationMonoRegular = skiaModule.SkFontMgr.RefDefault().makeFromData(nativeData, 0)
   const paint = new skiaModule.SkPaint()
   paint.setTextSize(48.0)
   paint.setAntiAlias(true)
   paint.setColor(0xff4281A4)
-  const liberationMonoRegular = skiaModule.SkTypeface.MakeFromFile('/usr/share/fonts/liberation-fonts/LiberationMono-Regular.ttf', 0)
   paint.setTypeface(liberationMonoRegular)
 
+  const data1 = fs.readFileSync(path.join(__dirname, '.', 'fonts', 'liberation-fonts', 'LiberationSerif-BoldItalic.ttf'))
+  const nativeData1 = skiaModule.SkData.MakeUninitialized(data1.byteLength)
+  const nativeBuffer1 = skiaModule.getSkDataBytes(nativeData1)
+  nativeBuffer1.set(data1)
+  const liberationSerifBoldItalic = skiaModule.SkFontMgr.RefDefault().makeFromData(nativeData1, 0)
   const paint1 = new skiaModule.SkPaint()
   paint1.setTextSize(48.0)
   paint1.setAntiAlias(true)
   paint1.setColor(0xff6291B4)
-  const liberationSerifBoldItalic = skiaModule.SkTypeface.MakeFromFile('/usr/share/fonts/liberation-fonts/LiberationSerif-BoldItalic.ttf', 0)
   paint1.setTypeface(liberationSerifBoldItalic)
-
-  const paint2 = new skiaModule.SkPaint()
-  paint2.setTextSize(48.0)
-  paint2.setAntiAlias(true)
-  paint2.setColor(0xff6291B4)
-  const liberationSansRegular = skiaModule.SkTypeface.MakeFromFile('/usr/share/fonts/liberation-fonts/LiberationSans-Regular.ttf', 0)
-  paint2.setTypeface(liberationSansRegular)
 
   canvas.drawText('Liberation Mono Regular', 20, 64, paint)
   canvas.drawText('Liberation Serif Bold Italic', 20, 128, paint1)
 }
 
 function main (skiaModule) {
-  skiaModule.FS.mkdir('/usr')
-  skiaModule.FS.mkdir('/usr/share')
-  skiaModule.FS.mkdir('/usr/share/fonts')
-  // by putting our fonts at /usr/share/fonts, skia will automagically find them.
-  skiaModule.FS.mount(skiaModule.FS.filesystems.NODEFS, {root: './fonts'}, '/usr/share/fonts')
-
   const width = 768
   const height = 192
   const path = 'out_text.png'
