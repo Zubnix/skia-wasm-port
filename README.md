@@ -14,7 +14,7 @@ llvm bitcode from Skia sources. This library will become usable as soon as enoug
 
 An example is currently available under `example_star.js` that can be run with node. Running in the
 browser is also possible if the png file saving is adjusted accordingly. The example exactly matches the one found
-on the Skia [website](https://skia.org/user/api/creating_skcanvas).
+on the Skia [website](https://skia.org/user/api/skcanvas_creation).
 
 `example_star.js` demonstrates path rendering:
 
