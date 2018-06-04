@@ -1,3 +1,4 @@
+#include <iostream>
 #include "skia.h"
 
 #include <emscripten.h>
@@ -37,28 +38,38 @@ val getSkDataBytes(const SkData *data) {
     return val(typed_memory_view(data->size(), data->bytes()));
 }
 
-sk_sp <SkSurface> makeWebGLSurface(char *id, int width, int height) {
+sk_sp <SkSurface> makeWebGLSurface(std::string id, int width, int height) {
     // Context configurations
     EmscriptenWebGLContextAttributes attrs;
-    attrs.explicitSwapControl = 0;
-    attrs.depth = 1;
-    attrs.stencil = 1;
-    attrs.antialias = 1;
-    attrs.majorVersion = 2;
-    attrs.minorVersion = 0;
+    emscripten_webgl_init_context_attributes(&attrs);
+    attrs.majorVersion = 1;
+    attrs.enableExtensionsByDefault = true;
 
-    EMSCRIPTEN_WEBGL_CONTEXT_HANDLE context = emscripten_webgl_create_context(id, &attrs);
-    emscripten_webgl_make_context_current(context);
-
+    EMSCRIPTEN_WEBGL_CONTEXT_HANDLE context = emscripten_webgl_create_context(id.c_str(), &attrs);
+    printf("create webgl context %d\n", context);
+    if (context < 0) {
+        printf("failed to create webgl context %d\n", context);
+    }
+    EMSCRIPTEN_RESULT r = emscripten_webgl_make_context_current(context);
+    printf("make webgl current %d\n", r);
+    if (r < 0) {
+        printf("failed to make webgl current %d\n", r);
+    }
 
     // setup GrContext
-    auto interface = GrGLMakeNativeInterface();
+    sk_sp<const GrGLInterface> grGLInterface = nullptr;
     // setup contexts
-    sk_sp <GrContext> grContext(GrContext::MakeGL(interface));
+    sk_sp <GrContext> grContext = GrContext::MakeGL(grGLInterface);
+    printf("grContext %s\n", grContext.get()->dump().c_str());
 
-
-    SkImageInfo info = SkImageInfo::MakeN32Premul(width, height);
-    sk_sp <SkSurface> gpuSurface = SkSurface::MakeRenderTarget(grContext.get(), SkBudgeted::kNo, info);
+    const SkImageInfo info = SkImageInfo::MakeN32(800, 600, kPremul_SkAlphaType);
+    sk_sp <SkSurface> gpuSurface = SkSurface::MakeRenderTarget(grContext.get(), SkBudgeted::kNo, info, 0,
+                                                               kTopLeft_GrSurfaceOrigin,
+                                                               nullptr, false);
+    printf("gpuSurface %p\n", gpuSurface.get());
+    if (!gpuSurface.get()) {
+        printf("failed to create gpu surface.");
+    }
 
     return gpuSurface;
 }
