@@ -124,8 +124,9 @@ static inline float sk_double_to_float(double x) {
     return static_cast<float>(x);
 }
 
-static const uint32_t kIEEENotANumber = 0x7fffffff;
-#define SK_FloatNaN                 (*SkTCast<const float*>(&kIEEENotANumber))
+//https://bugs.chromium.org/p/skia/issues/detail?id=6199
+#define SK_FloatNaN  NAN // C++11 standard
+
 #define SK_FloatInfinity            (+(float)INFINITY)
 #define SK_FloatNegativeInfinity    (-(float)INFINITY)
 
