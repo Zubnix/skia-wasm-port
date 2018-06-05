@@ -61,7 +61,7 @@ sk_sp <SkSurface> makeWebGLSurface(std::string id, int width, int height) {
     sk_sp <GrContext> grContext = GrContext::MakeGL(grGLInterface);
     printf("grContext %p\n", grContext.get());
 
-    const SkImageInfo info = SkImageInfo::MakeN32(800, 600, kPremul_SkAlphaType);
+    const SkImageInfo info = SkImageInfo::Make(width, height, kRGBA_8888_SkColorType, kPremul_SkAlphaType, nullptr);
     sk_sp <SkSurface> gpuSurface = SkSurface::MakeRenderTarget(grContext.get(), SkBudgeted::kNo, info, 0,
                                                                kTopLeft_GrSurfaceOrigin,
                                                                nullptr, false);

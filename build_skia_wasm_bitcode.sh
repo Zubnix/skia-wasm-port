@@ -1,6 +1,5 @@
 #!/bin/bash
 
-patch -p0 < float_nan.patch
 patch -p0 < wasm_compatible_build.patch
 
 #eg /home/john/emsdk-portable
@@ -33,7 +32,6 @@ skia_use_icu=false \
 skia_use_expat=false \
 skia_use_piex=false \
 skia_use_zlib=true \
-skia_use_skcms=false \
 \
 skia_enable_gpu=true \
 skia_enable_pdf=false"
