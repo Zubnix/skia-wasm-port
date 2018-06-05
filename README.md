@@ -45,5 +45,5 @@ and a `skia.wasm` file. To test the build, simply run `example_star.js`.
 Clone the official Skia git repository and checkout commit `b6e035ee08ac85367e5c0616ab26e3dd0bf5db69`. Newer commits
 break the WASM build. See: https://bugs.chromium.org/p/skia/issues/detail?id=8045
 
-To build the Skia bitcode, copy over the `build_skia_wasm_bitcode.sh` script together with the `float_nan.pathch` and the `wasm_enable_custom_fontmgr.patch`,
-then simply execute `bash build_skia_wasm_bitcode.sh`
+To build the Skia bitcode, copy over the `build_skia_wasm_bitcode.sh` script together with the `float_nan.patch` and the `wasm_compatible_build.patch`,
+then simply execute `bash build_skia_wasm_bitcode.sh`. Make sure you define the correct paths in the build script!
