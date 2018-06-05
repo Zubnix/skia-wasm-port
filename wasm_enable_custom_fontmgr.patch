@@ -1,0 +1,16 @@
+Index: BUILD.gn
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- BUILD.gn	(date 1527627664000)
++++ BUILD.gn	(date 1528200093000)
+@@ -392,7 +392,7 @@
+ }
+ 
+ optional("fontmgr_custom") {
+-  enabled = is_linux && skia_use_freetype && !skia_use_fontconfig
++  enabled = (is_linux || target_cpu == "wasm") && skia_use_freetype && !skia_use_fontconfig
+ 
+   deps = [
+     ":typeface_freetype",

@@ -42,7 +42,7 @@ sk_sp <SkSurface> makeWebGLSurface(std::string id, int width, int height) {
     // Context configurations
     EmscriptenWebGLContextAttributes attrs;
     emscripten_webgl_init_context_attributes(&attrs);
-    attrs.majorVersion = 1;
+    attrs.majorVersion = 2;
     attrs.enableExtensionsByDefault = true;
 
     EMSCRIPTEN_WEBGL_CONTEXT_HANDLE context = emscripten_webgl_create_context(id.c_str(), &attrs);
@@ -60,7 +60,7 @@ sk_sp <SkSurface> makeWebGLSurface(std::string id, int width, int height) {
     sk_sp<const GrGLInterface> grGLInterface = nullptr;
     // setup contexts
     sk_sp <GrContext> grContext = GrContext::MakeGL(grGLInterface);
-    printf("grContext %s\n", grContext.get()->dump().c_str());
+    printf("grContext %p\n", grContext.get());
 
     const SkImageInfo info = SkImageInfo::MakeN32(800, 600, kPremul_SkAlphaType);
     sk_sp <SkSurface> gpuSurface = SkSurface::MakeRenderTarget(grContext.get(), SkBudgeted::kNo, info, 0,
