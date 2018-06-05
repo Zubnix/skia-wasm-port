@@ -4,7 +4,7 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
 --- BUILD.gn	(date 1527627664000)
-+++ BUILD.gn	(date 1528200093000)
++++ BUILD.gn	(date 1528206782000)
 @@ -392,7 +392,7 @@
  }
  
@@ -14,3 +14,12 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
  
    deps = [
      ":typeface_freetype",
+@@ -948,7 +948,7 @@
+     ]
+   }
+ 
+-  if (is_linux) {
++  if (is_linux || target_cpu == "wasm") {
+     sources += [ "src/ports/SkDebug_stdio.cpp" ]
+     if (skia_use_egl) {
+       libs += [ "GLESv2" ]

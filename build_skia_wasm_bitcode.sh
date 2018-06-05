@@ -1,7 +1,7 @@
 #!/bin/bash
 
 patch -p0 < float_nan.patch
-patch -p0 < wasm_enable_custom_fontmgr.patch
+patch -p0 < wasm_compatible_build.patch
 
 #eg /home/john/emsdk-portable
 EMSDK="/home/zubzub/emsdk-portable"
@@ -10,7 +10,7 @@ EM_VERSION="incoming"
 
 source ${EMSDK}/emsdk_env.sh
 
-./bin/gn gen ./out/Build-wasm-Release/Release --args="cc=\"${EMSDK}/emscripten/${EM_VERSION}/emcc\" extra_cflags_cc=[\"-frtti\",\"-s\",\"USE_FREETYPE=1\"] cxx=\"${EMSDK}/emscripten/${EM_VERSION}/em++\" extra_cflags=[\"-Wno-unknown-warning-option\",\"-s\",\"USE_FREETYPE=1\",\"-s\",\"USE_WEBGL2=1\",\"-s\",\"USE_LIBPNG=1\"] \
+./bin/gn gen ./out/Build-wasm-Release/Release --args="cc=\"${EMSDK}/emscripten/${EM_VERSION}/emcc\" extra_cflags_cc=[\"-frtti\",\"-s\",\"USE_FREETYPE=1\"] cxx=\"${EMSDK}/emscripten/${EM_VERSION}/em++\" extra_cflags=[\"-Wno-unknown-warning-option\",\"-s\",\"USE_FREETYPE=1\",\"-s\",\"USE_LIBPNG=1\"] \
 is_debug=false \
 is_official_build=true \
 is_component_build=false \
