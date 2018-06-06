@@ -13,6 +13,7 @@
 #include <atomic>
 #include <functional>
 #include <memory>
+#include <ostream>
 #include <type_traits>
 #include <utility>
 
@@ -244,8 +245,6 @@ private:
  *  may have its ref/unref be thread-safe, but that is not assumed/imposed by sk_sp.
  */
 template <typename T> class sk_sp {
-    /** Supports safe bool idiom. Obsolete with explicit operator bool. */
-    using unspecified_bool_type = T* sk_sp::*;
 public:
     using element_type = T;
 
@@ -291,7 +290,9 @@ public:
      *  object.
      */
     sk_sp<T>& operator=(const sk_sp<T>& that) {
-        this->reset(SkSafeRef(that.get()));
+        if (this != &that) {
+            this->reset(SkSafeRef(that.get()));
+        }
         return *this;
     }
     template <typename U, typename = skstd::enable_if_t<std::is_convertible<U*, T*>::value>>
@@ -320,12 +321,7 @@ public:
         return *this->get();
     }
 
-    // MSVC 2013 does not work correctly with explicit operator bool.
-    // https://chromium-cpp.appspot.com/#core-blacklist
-    // When explicit operator bool can be used, remove operator! and operator unspecified_bool_type.
-    //explicit operator bool() const { return this->get() != nullptr; }
-    operator unspecified_bool_type() const { return this->get() ? &sk_sp::fPtr : nullptr; }
-    bool operator!() const { return this->get() == nullptr; }
+    explicit operator bool() const { return this->get() != nullptr; }
 
     T* get() const { return fPtr; }
     T* operator->() const { return fPtr; }
@@ -430,6 +426,11 @@ template <typename T> inline bool operator>=(std::nullptr_t, const sk_sp<T>& b) 
     return !(nullptr < b);
 }
 
+template <typename C, typename CT, typename T>
+auto operator<<(std::basic_ostream<C, CT>& os, const sk_sp<T>& sp) -> decltype(os << sp.get()) {
+    return os << sp.get();
+}
+
 template <typename T, typename... Args>
 sk_sp<T> sk_make_sp(Args&&... args) {
     return sk_sp<T>(new T(std::forward<Args>(args)...));
@@ -443,6 +444,10 @@ sk_sp<T> sk_make_sp(Args&&... args) {
  */
 template <typename T> sk_sp<T> sk_ref_sp(T* obj) {
     return sk_sp<T>(SkSafeRef(obj));
+}
+
+template <typename T> sk_sp<T> sk_ref_sp(const T* obj) {
+    return sk_sp<T>(const_cast<T*>(SkSafeRef(obj)));
 }
 
 #endif

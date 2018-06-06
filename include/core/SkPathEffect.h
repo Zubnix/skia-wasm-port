@@ -145,15 +145,29 @@ public:
 
     virtual DashType asADash(DashInfo* info) const;
 
-    SK_TO_STRING_PUREVIRT()
-    SK_DEFINE_FLATTENABLE_TYPE(SkPathEffect)
+    virtual void toString(SkString* str) const = 0;
+
+    static void InitializeFlattenables();
+
+    static SkFlattenable::Type GetFlattenableType() {
+        return kSkPathEffect_Type;
+    }
+
+    SkFlattenable::Type getFlattenableType() const override {
+        return kSkPathEffect_Type;
+    }
+
+    static sk_sp<SkPathEffect> Deserialize(const void* data, size_t size,
+                                          const SkDeserialProcs* procs = nullptr) {
+        return sk_sp<SkPathEffect>(static_cast<SkPathEffect*>(
+                                  SkFlattenable::Deserialize(
+                                  kSkPathEffect_Type, data, size, procs).release()));
+    }
 
 #ifdef SK_BUILD_FOR_ANDROID_FRAMEWORK
     /// Override for subclasses as appropriate.
     virtual bool exposedInAndroidJavaAPI() const { return false; }
 #endif
-
-    SK_DECLARE_FLATTENABLE_REGISTRAR_GROUP()
 
 protected:
     SkPathEffect() {}

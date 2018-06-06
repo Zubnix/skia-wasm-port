@@ -12,11 +12,13 @@
 #include "SkTypes.h"
 #include "GrTypes.h"
 #include "../private/GrTypesPriv.h"
+#include "GrDriverBugWorkarounds.h"
 
 #include <vector>
 
 class SkExecutor;
 
+#if SK_SUPPORT_GPU
 struct GrContextOptions {
     enum class Enable {
         /** Forces an option to be disabled. */
@@ -70,9 +72,6 @@ struct GrContextOptions {
      */
     SkExecutor* fExecutor = nullptr;
 
-    /** some gpus have problems with partial writes of the rendertarget */
-    bool fUseDrawInsteadOfPartialRenderTargetWrite = false;
-
     /** Construct mipmaps manually, via repeated downsampling draw-calls. This is used when
         the driver's implementation (glGenerateMipmap) contains bugs. This requires mipmap
         level and LOD control (ie desktop or ES3). */
@@ -89,14 +88,6 @@ struct GrContextOptions {
      * are commonly rendered at the same scale and fractional translation.
      */
     bool fAllowPathMaskCaching = true;
-
-    /**
-     * If true, sRGB support will not be enabled unless sRGB decoding can be disabled (via an
-     * extension). If mixed use of "legacy" mode and sRGB/color-correct mode is not required, this
-     * can be set to false, which will significantly expand the number of devices that qualify for
-     * sRGB support.
-     */
-    bool fRequireDecodeDisableForSRGB = true;
 
     /**
      * If true, the GPU will not be used to perform YUV -> RGB conversion when generating
@@ -135,10 +126,57 @@ struct GrContextOptions {
     bool fAvoidStencilBuffers = false;
 
     /**
+     * When specifing new data for a vertex/index buffer that replaces old data Ganesh can give
+     * a hint to the driver that the previous data will not be used in future draws like this:
+     *  glBufferData(GL_..._BUFFER, size, NULL, usage);       //<--hint, NULL means
+     *  glBufferSubData(GL_..._BUFFER, 0, lessThanSize, data) //   old data can't be
+     *                                                        //   used again.
+     * However, this can be an unoptimization on some platforms, esp. Chrome.
+     * Chrome's cmd buffer will create a new allocation and memset the whole thing
+     * to zero (for security reasons).
+     * Defaults to the value of GR_GL_USE_BUFFER_DATA_NULL_HINT #define (which is, by default, 1).
+     */
+    Enable fUseGLBufferDataNullHint = Enable::kDefault;
+
+    /**
+     * If true, texture fetches from mip-mapped textures will be biased to read larger MIP levels.
+     * This has the effect of sharpening those textures, at the cost of some aliasing, and possible
+     * performance impact.
+     */
+    bool fSharpenMipmappedTextures = false;
+
+    /**
      * Enables driver workaround to use draws instead of glClear. This only applies to
      * kOpenGL_GrBackend.
      */
     Enable fUseDrawInsteadOfGLClear = Enable::kDefault;
+
+    /**
+     * Allow Ganesh to explicitly allocate resources at flush time rather than incrementally while
+     * drawing. This will eventually just be the way it is but, for now, it is optional.
+     */
+    Enable fExplicitlyAllocateGPUResources = Enable::kDefault;
+
+    /**
+     * Allow Ganesh to sort the opLists prior to allocating resources. This is an optional
+     * behavior that is only relevant when 'fExplicitlyAllocateGPUResources' is enabled.
+     * Eventually this will just be what is done and will not be optional.
+     */
+    Enable fSortRenderTargets = Enable::kDefault;
+
+    /**
+     * Some ES3 contexts report the ES2 external image extension, but not the ES3 version.
+     * If support for external images is critical, enabling this option will cause Ganesh to limit
+     * shaders to the ES2 shading language in that situation.
+     */
+    bool fPreferExternalImagesOverES3 = false;
+
+    /**
+     * Disables correctness workarounds that are enabled for particular GPUs, OSes, or drivers.
+     * This does not affect code path choices that are made for perfomance reasons nor does it
+     * override other GrContextOption settings.
+     */
+    bool fDisableDriverCorrectnessWorkarounds = false;
 
     /**
      * Cache in which to store compiled shader binaries between runs.
@@ -195,6 +233,13 @@ struct GrContextOptions {
      */
     Enable fDistanceFieldGlyphVerticesAlwaysHaveW = Enable::kDefault;
 #endif
+
+    GrDriverBugWorkarounds fDriverBugWorkarounds;
 };
+#else
+struct GrContextOptions {
+    struct PersistentCache {};
+};
+#endif
 
 #endif

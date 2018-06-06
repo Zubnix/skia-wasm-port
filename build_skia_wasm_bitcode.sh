@@ -22,7 +22,6 @@ skia_use_libpng=true \
 skia_use_lua=false \
 skia_use_dng_sdk=false \
 skia_use_fontconfig=false \
-skia_enable_skottie=false \
 skia_use_libjpeg_turbo=false \
 skia_use_libheif=false \
 skia_use_expat=false \

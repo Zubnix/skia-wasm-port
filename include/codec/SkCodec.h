@@ -34,7 +34,6 @@ namespace DM {
 class CodecSrc;
 class ColorCodecSrc;
 }
-class ColorCodecBench;
 
 /**
  *  Abstraction layer directly on top of an image codec.
@@ -106,6 +105,11 @@ public:
          */
         kUnimplemented,
     };
+
+    /**
+     *  Readable string representing the error code.
+     */
+    static const char* ResultToString(Result);
 
     /**
      *  If this stream represents an encoded image that we know how to decode,

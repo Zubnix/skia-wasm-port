@@ -12,6 +12,7 @@
 
 #include "vk/GrVkDefines.h"
 #include "vk/GrVkInterface.h"
+#include "vk/GrVkMemoryAllocator.h"
 
 enum GrVkExtensionFlags {
     kEXT_debug_report_GrVkExtensionFlag    = 0x0001,
@@ -35,7 +36,7 @@ enum GrVkFeatureFlags {
 // The QueueFamilyIndex must match the family of the given queue. It is needed for CommandPool
 // creation, and any GrBackendObjects handed to us (e.g., for wrapped textures) need to be created
 // in or transitioned to that family.
-struct GrVkBackendContext : public SkRefCnt {
+struct SK_API GrVkBackendContext : public SkRefCnt {
     VkInstance                 fInstance;
     VkPhysicalDevice           fPhysicalDevice;
     VkDevice                   fDevice;
@@ -45,6 +46,8 @@ struct GrVkBackendContext : public SkRefCnt {
     uint32_t                   fExtensions;
     uint32_t                   fFeatures;
     sk_sp<const GrVkInterface> fInterface;
+    sk_sp<GrVkMemoryAllocator> fMemoryAllocator;
+
     /**
      * Controls whether this object destroys the instance and device upon destruction. The default
      * is temporarily 'true' to avoid breaking existing clients but will be changed to 'false'.

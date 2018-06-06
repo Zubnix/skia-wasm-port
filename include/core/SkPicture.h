@@ -46,7 +46,7 @@ public:
     /**
      *  Recreate a picture that was serialized into a buffer. If the creation requires bitmap
      *  decoding, the decoder must be set on the SkReadBuffer parameter by calling
-     *  SkReadBuffer::setBitmapDecoder() before calling SkPicture::CreateFromBuffer().
+     *  SkReadBuffer::setBitmapDecoder() before calling SkPicture::MakeFromBuffer().
      *  @param SkReadBuffer Serialized picture data.
      *  @return A new SkPicture representing the serialized data, or NULL if the buffer is
      *          invalid.
@@ -91,6 +91,14 @@ public:
     void serialize(SkWStream*, const SkSerialProcs* = nullptr) const;
 
     /**
+     * Return a placeholder SkPicture.
+     * This placeholder does not draw anything itself.  It has a distinct uniqueID()
+     * (just like all SkPictures) and will always be visible to SkSerialProcs.
+     * @param cull the placeholder's dimensions
+     */
+    static sk_sp<SkPicture> MakePlaceholder(SkRect cull);
+
+    /**
      *  Serialize to a buffer.
      */
     void flatten(SkWriteBuffer&) const;
@@ -108,8 +116,6 @@ public:
     // Returns NULL if this is not an SkBigPicture.
     virtual const SkBigPicture* asSkBigPicture() const { return nullptr; }
 
-    static bool PictureIOSecurityPrecautionsEnabled();
-
 private:
     // Subclass whitelist.
     SkPicture();
@@ -124,8 +130,8 @@ private:
     /** Return true if the SkStream/Buffer represents a serialized picture, and
      fills out SkPictInfo. After this function returns, the data source is not
      rewound so it will have to be manually reset before passing to
-     CreateFromStream or CreateFromBuffer. Note, CreateFromStream and
-     CreateFromBuffer perform this check internally so these entry points are
+     MakeFromStream or MakeFromBuffer. Note, MakeFromStream and
+     MakeFromBuffer perform this check internally so these entry points are
      intended for stand alone tools.
      If false is returned, SkPictInfo is unmodified.
      */
@@ -160,10 +166,16 @@ private:
     // V57: Sweep tiling info.
     // V58: No more 2pt conical flipping.
     // V59: No more LocalSpace option on PictureImageFilter
+    // V60: Remove flags in picture header
+    // V61: Change SkDrawPictureRec to take two colors rather than two alphas
+    // V62: Don't negate size of custom encoded images (don't write origin x,y either)
+    // V63: Store image bounds (including origin) instead of just width/height to support subsets
 
     // Only SKPs within the min/current picture version range (inclusive) can be read.
-    static const uint32_t     MIN_PICTURE_VERSION = 51;     // Produced by Chrome ~M56.
-    static const uint32_t CURRENT_PICTURE_VERSION = 59;
+    static const uint32_t     MIN_PICTURE_VERSION = 56;     // august 2017
+    static const uint32_t CURRENT_PICTURE_VERSION = 63;
+
+    static_assert(MIN_PICTURE_VERSION <= 62, "Remove kFontAxes_bad from SkFontDescriptor.cpp");
 
     static bool IsValidPictInfo(const SkPictInfo& info);
     static sk_sp<SkPicture> Forwardport(const SkPictInfo&,

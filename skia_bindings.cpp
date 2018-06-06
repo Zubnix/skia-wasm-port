@@ -1,5 +1,6 @@
 #include <iostream>
 #include "skia.h"
+#include "include/ports/SkFontMgr.h"
 
 #include <emscripten.h>
 #include <emscripten/html5.h>
@@ -42,6 +43,9 @@ sk_sp <SkSurface> makeWebGLSurface(std::string id, int width, int height) {
     // Context configurations
     EmscriptenWebGLContextAttributes attrs;
     emscripten_webgl_init_context_attributes(&attrs);
+    attrs.alpha = true;
+    attrs.premultipliedAlpha = true;
+    attrs.majorVersion = 1;
     attrs.enableExtensionsByDefault = true;
 
     EMSCRIPTEN_WEBGL_CONTEXT_HANDLE context = emscripten_webgl_create_context(id.c_str(), &attrs);
@@ -69,6 +73,8 @@ sk_sp <SkSurface> makeWebGLSurface(std::string id, int width, int height) {
     if (!gpuSurface.get()) {
         printf("failed to create gpu surface.");
     }
+
+    GrBackendRenderTarget fb = gpuSurface->getBackendRenderTarget(SkSurface::kFlushRead_BackendHandleAccess);
 
     return gpuSurface;
 }

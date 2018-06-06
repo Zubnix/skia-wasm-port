@@ -8,16 +8,15 @@
 #ifndef SkShader_DEFINED
 #define SkShader_DEFINED
 
-#include "SkBitmap.h"
+#include "SkBlendMode.h"
+#include "SkColor.h"
 #include "SkFilterQuality.h"
 #include "SkFlattenable.h"
 #include "SkImageInfo.h"
-#include "SkMask.h"
 #include "SkMatrix.h"
-#include "SkPaint.h"
-#include "../gpu/GrColor.h"
 
 class SkArenaAlloc;
+class SkBitmap;
 class SkColorFilter;
 class SkColorSpace;
 class SkColorSpaceXformer;
@@ -54,15 +53,16 @@ public:
          */
         kMirror_TileMode,
 
-#if 0
-        /** only draw within the original domain, return 0 everywhere else */
+        /**
+         *  Only draw within the original domain, return transparent-black everywhere else.
+         *  EXPERIMENTAL -- DO NOT USE YET
+         */
         kDecal_TileMode,
-#endif
+
+        kLast_TileMode = kDecal_TileMode
     };
 
-    enum {
-        kTileModeCount = kMirror_TileMode + 1
-    };
+    static constexpr int kTileModeCount = kLast_TileMode + 1;
 
     /**
      *  Returns the local matrix.

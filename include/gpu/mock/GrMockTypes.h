@@ -12,7 +12,21 @@
 #include "../private/GrTypesPriv.h"
 
 struct GrMockTextureInfo {
+    GrPixelConfig fConfig;
     int fID;
+
+    bool operator==(const GrMockTextureInfo& that) const {
+        return fConfig == that.fConfig && fID == that.fID;
+    }
+};
+
+struct GrMockRenderTargetInfo {
+    GrPixelConfig fConfig;
+    int fID;
+
+    bool operator==(const GrMockRenderTargetInfo& that) const {
+        return fConfig == that.fConfig && fID == that.fID;
+    }
 };
 
 /**
@@ -22,8 +36,9 @@ struct GrMockTextureInfo {
  */
 struct GrMockOptions {
     GrMockOptions() {
+        using Renderability = ConfigOptions::Renderability;
         // By default RGBA_8888 is textureable and renderable and A8 and RGB565 are texturable.
-        fConfigOptions[kRGBA_8888_GrPixelConfig].fRenderable[0] = true;
+        fConfigOptions[kRGBA_8888_GrPixelConfig].fRenderability = Renderability::kNonMSAA;
         fConfigOptions[kRGBA_8888_GrPixelConfig].fTexturable = true;
         fConfigOptions[kAlpha_8_GrPixelConfig].fTexturable = true;
         fConfigOptions[kAlpha_8_as_Alpha_GrPixelConfig].fTexturable = true;
@@ -32,12 +47,12 @@ struct GrMockOptions {
     }
 
     struct ConfigOptions {
-        /** The first value is for non-MSAA rendering, the second for MSAA. */
-        bool fRenderable[2] = {false, false};
+        enum Renderability { kNo, kNonMSAA, kMSAA };
+        Renderability fRenderability;
         bool fTexturable = false;
     };
 
-    // GPU options.
+    // GrCaps options.
     bool fInstanceAttribSupport = false;
     uint32_t fMapBufferFlags = 0;
     int fMaxTextureSize = 2048;
@@ -45,7 +60,7 @@ struct GrMockOptions {
     int fMaxVertexAttributes = 16;
     ConfigOptions fConfigOptions[kGrPixelConfigCnt];
 
-    // Shader options.
+    // GrShaderCaps options.
     bool fGeometryShaderSupport = false;
     bool fTexelBufferSupport = false;
     bool fIntegerSupport = false;
@@ -53,6 +68,9 @@ struct GrMockOptions {
     int fMaxVertexSamplers = 0;
     int fMaxFragmentSamplers = 8;
     bool fShaderDerivativeSupport = true;
+
+    // GrMockGpu options.
+    bool fFailTextureAllocations = false;
 };
 
 #endif

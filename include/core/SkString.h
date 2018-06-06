@@ -186,8 +186,6 @@ public:
     void set(const SkString& src) { *this = src; }
     void set(const char text[]);
     void set(const char text[], size_t len);
-    void setUTF16(const uint16_t[]);
-    void setUTF16(const uint16_t[], size_t len);
 
     void insert(size_t offset, const SkString& src) { this->insert(offset, src.c_str(), src.size()); }
     void insert(size_t offset, const char text[]);
@@ -272,6 +270,9 @@ private:
 
 /// Creates a new string and writes into it using a printf()-style format.
 SkString SkStringPrintf(const char* format, ...);
+/// This makes it easier to write a caller as a VAR_ARGS function where the format string is
+/// optional.
+static inline SkString SkStringPrintf() { return SkString(); }
 
 // Specialized to take advantage of SkString's fast swap path. The unspecialized function is
 // declared in SkTypes.h and called by SkTSort.

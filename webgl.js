@@ -9,8 +9,8 @@ function main(skiaModule) {
     document.body.appendChild(canvas)
 
     const gpuSurface = skiaModule.makeWebGLSurface(canvas.id, canvas.width, canvas.height)
-    const gpuCanvas = gpuSurface.getCanvas()
 
+    const gpuCanvas = gpuSurface.getCanvas()
     gpuCanvas.clear(0xFFFFFFFF)//white
 
     const paint = new skiaModule.SkPaint()
@@ -27,6 +27,7 @@ function main(skiaModule) {
 
     paint.setShader(skiaModule.SkGradientShader.MakeLinear(points, colors, pos, 2, skiaModule.SkShader.TileMode.kClamp_TileMode))
     gpuCanvas.drawPaint(paint)
+    gpuCanvas.flush()
 }
 
 
