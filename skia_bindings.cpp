@@ -1,6 +1,7 @@
 #include <iostream>
 #include "skia.h"
 #include "include/ports/SkFontMgr.h"
+#include <GL/gl.h>
 
 #include <emscripten.h>
 #include <emscripten/html5.h>
@@ -39,7 +40,7 @@ val getSkDataBytes(const SkData *data) {
     return val(typed_memory_view(data->size(), data->bytes()));
 }
 
-sk_sp <SkSurface> makeWebGLSurface(std::string id, int width, int height) {
+sk_sp<SkSurface> makeWebGLSurface(std::string id, int width, int height) {
     // Context configurations
     EmscriptenWebGLContextAttributes attrs;
     emscripten_webgl_init_context_attributes(&attrs);
@@ -49,34 +50,46 @@ sk_sp <SkSurface> makeWebGLSurface(std::string id, int width, int height) {
     attrs.enableExtensionsByDefault = true;
 
     EMSCRIPTEN_WEBGL_CONTEXT_HANDLE context = emscripten_webgl_create_context(id.c_str(), &attrs);
-    printf("create webgl context %d\n", context);
     if (context < 0) {
         printf("failed to create webgl context %d\n", context);
     }
     EMSCRIPTEN_RESULT r = emscripten_webgl_make_context_current(context);
-    printf("make webgl current %d\n", r);
     if (r < 0) {
         printf("failed to make webgl current %d\n", r);
     }
 
+    glViewport(0, 0, width, height);
+    glClearColor(1, 1, 1, 1);
+    glClearStencil(0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
     // setup GrContext
-    sk_sp<const GrGLInterface> grGLInterface = nullptr;
+    auto interface = GrGLMakeNativeInterface();
+
     // setup contexts
-    sk_sp <GrContext> grContext = GrContext::MakeGL(grGLInterface);
+    sk_sp<GrContext> grContext(GrContext::MakeGL(interface));
     printf("grContext %p\n", grContext.get());
 
-    const SkImageInfo info = SkImageInfo::Make(width, height, kRGBA_8888_SkColorType, kPremul_SkAlphaType, nullptr);
-    sk_sp <SkSurface> gpuSurface = SkSurface::MakeRenderTarget(grContext.get(), SkBudgeted::kNo, info, 0,
-                                                               kTopLeft_GrSurfaceOrigin,
-                                                               nullptr, false);
-    printf("gpuSurface %p\n", gpuSurface.get());
-    if (!gpuSurface.get()) {
-        printf("failed to create gpu surface.");
-    }
+    // Wrap the frame buffer object attached to the screen in a Skia render target so Skia can
+    // render to it
+    GrGLint buffer;
+    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &buffer);
+    GrGLFramebufferInfo info;
+    info.fFBOID = (GrGLuint) buffer;
+    SkColorType colorType;
 
-    GrBackendRenderTarget fb = gpuSurface->getBackendRenderTarget(SkSurface::kFlushRead_BackendHandleAccess);
+    info.fFormat = GL_RGBA8;
+    colorType = kRGBA_8888_SkColorType;
 
-    return gpuSurface;
+
+    GrBackendRenderTarget target(width, height, 0, 8, info);
+
+    SkSurfaceProps props(SkSurfaceProps::kLegacyFontHost_InitType);
+
+    sk_sp<SkSurface> surface(SkSurface::MakeFromBackendRenderTarget(grContext.get(), target,
+                                                                    kBottomLeft_GrSurfaceOrigin,
+                                                                    colorType, nullptr, &props));
+    return surface;
 }
 
 EMSCRIPTEN_BINDINGS(skia_module) {

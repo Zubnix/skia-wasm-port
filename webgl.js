@@ -17,7 +17,7 @@ function main(skiaModule) {
 
     const points = new skiaModule.VectorSkPoint()
     points.push_back(skiaModule.SkPoint.Make(0, 0))
-    points.push_back(skiaModule.SkPoint.Make(256, 256))
+    points.push_back(skiaModule.SkPoint.Make(canvas.width, canvas.height))
 
     const colors = new skiaModule.VectorSkColor()
     colors.push_back(0xFF00FF00)
