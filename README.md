@@ -28,6 +28,13 @@ on the Skia [website](https://skia.org/user/api/skcanvas_creation).
 
 ![alt text](https://raw.githubusercontent.com/Zubnix/skia-wasm-port/master/out_text.png)
 
+## WebGL
+
+Skia WASM  can also run in the browser while utilizing a WebGL accelerated back-end. This however requires
+some modifications to the existing Skia code, which is expected to be implemented upstream in the future.
+
+The `example_gradient.js` utilizing WebGL can be found in `docs/webgl.js`. A live example can be seen [here](https://zubnix.github.io/skia-wasm-port/).
+
 # Defining bindings
 Bindings are defined using [Embind](https://kripken.github.io/emscripten-site/docs/porting/connecting_cpp_and_javascript/embind.html).
 Currently defined bindings live in `skia_bindings.cpp`.
