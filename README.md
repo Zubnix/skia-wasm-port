@@ -35,7 +35,7 @@ some modifications to the existing Skia code, which is expected to be implemente
 The provided Skia bitcode in this repository includes the needed WebGL changes. More information can be found
 [here](https://bugs.chromium.org/p/skia/issues/detail?id=8041)
 
-The `example_gradient.js` utilizing WebGL can be found in `docs/webgl.js`. A live example can be seen [here](https://zubnix.github.io/skia-wasm-port/).
+The `example_gradient.js` utilizing WebGL can be found in `docs/webgl.js`. A live example can be seen [here](https://zubnix.github.io/skia-wasm-port/). If the page fails to load, try disabling any adblocker.
 
 # Defining bindings
 Bindings are defined using [Embind](https://kripken.github.io/emscripten-site/docs/porting/connecting_cpp_and_javascript/embind.html).
