@@ -68,7 +68,6 @@ sk_sp<SkSurface> makeWebGLSurface(std::string id, int width, int height) {
 
     // setup contexts
     sk_sp<GrContext> grContext(GrContext::MakeGL(interface));
-    printf("grContext %p\n", grContext.get());
 
     // Wrap the frame buffer object attached to the screen in a Skia render target so Skia can
     // render to it
@@ -174,6 +173,7 @@ EMSCRIPTEN_BINDINGS(skia_module) {
         class_<SkPath>("SkPath")
         .constructor<>()
         .constructor<const SkPath&>()
+        .function("setFillType",&SkPath::setFillType)
         .function("moveToXY",
         select_overload<void(SkScalar, SkScalar)>(&SkPath::moveTo))
         .function("moveToPoint",
@@ -183,6 +183,16 @@ EMSCRIPTEN_BINDINGS(skia_module) {
         .function("lineToPoint",
         select_overload<void(const SkPoint& p)>(&SkPath::lineTo))
         .function("close", &SkPath::close);
+
+        enum_<SkPath::FillType>("SkPath.FillType")
+        .value("kWinding_FillType", SkPath::FillType::kWinding_FillType)
+        .value("kEvenOdd_FillType", SkPath::FillType::kEvenOdd_FillType)
+        .value("kInverseWinding_FillType", SkPath::FillType::kInverseWinding_FillType)
+        .value("kInverseEvenOdd_FillType", SkPath::FillType::kInverseEvenOdd_FillType);
+        EM_ASM(
+        Module['SkPath']['FillType'] = Module['SkPath.FillType'];
+        delete Module['SkPath.FillType'];
+        );
         // SkPath.h ^
 
         // SkFontStyle.h ->
@@ -253,6 +263,15 @@ EMSCRIPTEN_BINDINGS(skia_module) {
         .function("clear", &SkCanvas::clear)
         .function("translate", &SkCanvas::translate)
         .function("drawPath", &SkCanvas::drawPath)
+        .function("save", &SkCanvas::save)
+        .function("restore", &SkCanvas::restore)
+        .function("drawRect", &SkCanvas::drawRect)
+        .function("rotate",
+        select_overload<void(SkScalar)>(&SkCanvas::rotate),
+        allow_raw_pointers())
+        .function("drawImage",
+        select_overload<void(const sk_sp<SkImage>&,SkScalar,SkScalar,const SkPaint*)>(&SkCanvas::drawImage),
+        allow_raw_pointers())
         .function("drawText",
         // we wrap the real function in a lambda to do the conversion of the js string (represented as an std:string) to a c string
         optional_override([](SkCanvas& this_, const std::string text, SkScalar x, SkScalar y, const SkPaint& p){
@@ -302,4 +321,27 @@ EMSCRIPTEN_BINDINGS(skia_module) {
         }),
         allow_raw_pointers());
         // SkGradientShader.h ^
+
+        // SkMatrix.h ->
+        class_<SkMatrix>("SkMatrix")
+        .constructor<>()
+        .function("setRotate",
+        select_overload<void(SkScalar)>(&SkMatrix::setRotate))
+        .function("mapPoints",
+        select_overload<void(SkPoint[],const SkPoint[],int)const>(&SkMatrix::mapPoints),
+        allow_raw_pointers());
+        // SkMatrix.h ^
+
+        // SkRandom.h ->
+        class_<SkRandom>("SkRandom")
+        .constructor<>()
+        .function("nextU",&SkRandom::nextU);
+        // SkRandom.h ^
+
+        // SkRect.h ->
+        class_<SkRect>("SkRect")
+        .class_function("MakeLTRB", &SkRect::MakeLTRB, allow_raw_pointers())
+        .property("fRight",&SkRect::fRight)
+        .property("fBottom",&SkRect::fBottom);
+        // SkRect.h ^
 }
