@@ -19,7 +19,7 @@ async function loadFont () {
   const {skiaModule, paint} = state
 
   const request = new XMLHttpRequest()
-  request.open('GET', '/LiberationMono-Regular.ttf', true)
+  request.open('GET', `${window.location}/LiberationMono-Regular.ttf`, true)
   request.responseType = 'arraybuffer'
 
   const fontData = await new Promise((resolve) => {
