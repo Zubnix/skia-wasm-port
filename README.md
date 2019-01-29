@@ -1,3 +1,5 @@
+This project has been superseded by Google's [CanvasKit](https://skia.org/user/modules/canvaskit)
+
 # skia-wasm-port
 Port of the Skia drawing library to wasm, for use in node &amp; browser.
 
